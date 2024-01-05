@@ -29,6 +29,10 @@
             <h2 class="text-center mb-3">Edit Image</h2>
   <form action="/edit/{id}" method="post" enctype="multipart/form-data" th:action="@{'/edit/' + ${image.id}}">
                 <div class="mb-3">
+        <label for="title" class="form-label">Title</label>
+        <input type="text" class="form-control" id="title" name="title" th:value="${image.title}">
+    </div>
+                <div class="mb-3">
                     <label for="image" class="form-label">Choose New Image</label>
                     <input type="file" class="form-control" id="image" name="image" required="required">
                 </div>

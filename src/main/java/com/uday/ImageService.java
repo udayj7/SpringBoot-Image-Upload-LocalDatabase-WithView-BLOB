@@ -11,4 +11,5 @@ public interface ImageService {
     
     public Image update(long id, Image updatedImage) ;
     public void delete(long id);
+    public Image updateTitle(long id, String newTitle);
 }

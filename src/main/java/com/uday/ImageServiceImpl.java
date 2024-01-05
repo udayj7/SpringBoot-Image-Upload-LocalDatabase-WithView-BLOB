@@ -39,4 +39,14 @@ public class ImageServiceImpl implements ImageService {
 	    public void delete(long id) {
 	        imageRepository.deleteById(id);
 	    }
+	    
+	    @Override
+	    public Image updateTitle(long id, String newTitle) {
+	        Image existingImage = imageRepository.findById(id).orElse(null);
+	        if (existingImage != null) {
+	            existingImage.setTitle(newTitle);
+	            return imageRepository.save(existingImage);
+	        }
+	        return null; // Handle non-existing image
+	    }
 }

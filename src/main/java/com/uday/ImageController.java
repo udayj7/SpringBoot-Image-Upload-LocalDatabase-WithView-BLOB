@@ -9,6 +9,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.sql.rowset.serial.SerialException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -58,13 +60,15 @@ public class ImageController {
 
     // add image - post
     @PostMapping("/add")
-    public String addImagePost(HttpServletRequest request,@RequestParam("image") MultipartFile file) throws IOException, SerialException, SQLException
+    public String addImagePost(HttpServletRequest request,@RequestParam("image") MultipartFile file,
+    		 @RequestParam("title") String title) throws IOException, SerialException, SQLException
     {
         byte[] bytes = file.getBytes();
         Blob blob = new javax.sql.rowset.serial.SerialBlob(bytes);
 
         Image image = new Image();
         image.setImage(blob);
+        image.setTitle(title);
         imageService.create(image);
         return "redirect:/";
     }
@@ -80,7 +84,8 @@ public class ImageController {
 
     // edit image - post
     @PostMapping("/edit/{id}")
-    public String editImagePost(@PathVariable long id, @RequestParam("image") MultipartFile file) throws IOException, SQLException {
+    public String editImagePost(@PathVariable long id, @RequestParam("image") MultipartFile file,
+    		 @RequestParam("title") String title) throws IOException, SQLException {
         Image existingImage = imageService.viewById(id);
 
         if (existingImage != null) {
@@ -89,6 +94,8 @@ public class ImageController {
 
             // Update the existing image
             existingImage.setImage(blob);
+            existingImage.getTitle();
+            existingImage.setTitle(title);
             imageService.update(id, existingImage);
         }
 
@@ -101,4 +108,17 @@ public class ImageController {
         imageService.delete(id);
         return "redirect:/";
     }
+    
+    @GetMapping("/download/{id}")
+    public ResponseEntity<byte[]> downloadImage(@PathVariable long id) throws IOException, SQLException {
+        Image image = imageService.viewById(id);
+        byte[] imageBytes = image.getImage().getBytes(1, (int) image.getImage().length());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.IMAGE_JPEG);
+        headers.setContentDispositionFormData("attachment", "image_" + id + ".jpg");
+
+        return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
+    }
+
 }
